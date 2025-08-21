@@ -41,9 +41,9 @@ def cast_date(ts: int | str) -> int:
 class GrafanaUrlInputs:
     from_ts: int | str
     to_ts: int | str
-    var_scenario: str
-    resource_groups: str
     names_space: str
+    var_scenario: str = None
+    resource_groups: str = None
     base_url: str = "http://mslab-2024:3000/d/"
     version: str = "eevf3vhn0308wd/k6-execution-monitoring-with-scenario-filters"
     org_id: int = 1
@@ -58,16 +58,16 @@ class GrafanaUrlInputs:
         """
         base_url = self.base_url + self.version + "?orgId=" + str(self.org_id)
         params = (
-            f"&var-Workspace="
-            f"&var-AKS={self.aksCluster}"
-            # f"&var-ds=beh175ytk7i80c"
-            f"&var-sub=KineticQATools"
-            f"&var-rg=rgProdSaaSSqlResources-EastUS"
-            f"&from={cast_date(self.from_ts)}"
-            f"&to={cast_date(self.to_ts)}"
-            f"&var-scenario={self.var_scenario}"
-            f"&var-ResourceGroups={self.resource_groups}"
-            f"&var-Namespace={self.names_space}"
+                f"&var-Workspace="
+                f"&var-AKS={self.aksCluster}"
+                # f"&var-ds=beh175ytk7i80c"
+                f"&var-sub=KineticQATools"
+                f"&var-rg=rgProdSaaSSqlResources-EastUS"
+                f"&from={cast_date(self.from_ts)}"
+                f"&to={cast_date(self.to_ts)}"
+                + (f"&var-scenario={self.var_scenario}" if self.var_scenario is not None else "")
+                + (f"&var-ResourceGroups={self.resource_groups}" if self.resource_groups is not None else "")
+                + (f"&var-Namespace={self.names_space}" if self.names_space is not None else "")
         )
         return base_url + params
 
