@@ -27,6 +27,13 @@ def cast_date(ts: int | str) -> int:
     if isinstance(ts, str) and "now" not in ts:
         dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
         return int(dt.timestamp() * 1000)
+    elif isinstance(ts, str) and "now" in ts:
+        if "m" in ts:
+            minutes = int(ts.split("now-")[1].replace("m", ""))
+            return int((datetime.now().timestamp() - (minutes * 60)) * 1000)
+        elif "h" in ts:
+            hours = int(ts.split("now-")[1].replace("h", ""))
+            return int((datetime.now().timestamp() - (hours * 3600)) * 1000)
     return ts
 
 
