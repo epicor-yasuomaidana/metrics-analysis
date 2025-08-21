@@ -1,7 +1,12 @@
 from collections import namedtuple
 from dataclasses import dataclass
+
 from selenium import webdriver
+from selenium.common import TimeoutException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.wait import WebDriverWait
 
 ChromeOptions = namedtuple("ChromeOptions", ["user_data_dir", "profile_directory"])
 
@@ -76,3 +81,21 @@ class ChromeDriver:
             print("\033[91mRedirected to login page.\033[0m")
             input("Press enter to continue...")
             self.driver.get(url)
+
+    def click_menu_and_get_new_csv(self,title: str):
+        driver = self.driver
+
+        menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
+        wait = WebDriverWait(driver, 60)
+        menu_button = wait.until(ec.element_to_be_clickable((By.XPATH, menu_xpath)))
+        menu_button.click()
+
+        driver.switch_to.active_element.send_keys('i')
+        expand_xpath = '//button[@aria-label="Expand query row"]'
+        try:
+            expand_button = wait.until(ec.element_to_be_clickable((By.XPATH, expand_xpath)))
+            expand_button.click()
+        except TimeoutException:
+            print("\t\033[91mExpand button not found, trying to locate it again.\033[0m")
+        except Exception as e:
+            print(e)
