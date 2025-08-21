@@ -1,0 +1,22 @@
+scenarios = [
+    "ARInvoiceTracker",
+    "BAQ",
+    "CopySalesOrder",
+    "CustomerTracker",
+    "GLJournalTracker",
+    "JobTracker",
+    "MiscARInvoice",
+    "PartMaintenance",
+    "PartTracker",
+    "POEntry10",
+    "POEntry20",
+    "ProcessMRP",
+    "QuantityOnHandCheck",
+    "QuoteEntry",
+    "SalesOrderEntry",
+    "SalesOrderErrorNO",
+    "SalesOrderErrorYES",
+    "SalesOrderTracker",
+    "SOEntry500ShipTos",
+    "SystemMonitor"
+]
