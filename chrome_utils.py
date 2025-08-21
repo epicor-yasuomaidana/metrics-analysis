@@ -1,5 +1,6 @@
 from collections import namedtuple
 from dataclasses import dataclass
+from datetime import datetime
 
 from selenium import webdriver
 from selenium.common import TimeoutException, ElementClickInterceptedException
@@ -13,10 +14,26 @@ ChromeOptions = namedtuple("ChromeOptions", ["user_data_dir", "profile_directory
 FromTo = namedtuple("FromTo", ["from_ts", "to_ts"])
 
 
+def cast_date(ts: int | str) -> int:
+    """
+    Converts a timestamp to an integer if it is a string representation of a date.
+
+    Args:
+        ts (int|str): The timestamp to convert.
+
+    Returns:
+        int: The converted timestamp as an integer.
+    """
+    if isinstance(ts, str) and "now" not in ts:
+        dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+        return int(dt.timestamp())
+    return ts
+
+
 @dataclass
 class GrafanaUrlInputs:
-    from_ts: int
-    to_ts: int
+    from_ts: int | str
+    to_ts: int | str
     var_scenario: str
     resource_groups: str
     names_space: str
@@ -39,13 +56,25 @@ class GrafanaUrlInputs:
             # f"&var-ds=beh175ytk7i80c"
             f"&var-sub=KineticQATools"
             f"&var-rg=rgProdSaaSSqlResources-EastUS"
-            f"&from={self.from_ts}"
-            f"&to={self.to_ts}"
+            f"&from={cast_date(self.from_ts)}"
+            f"&to={cast_date(self.to_ts)}"
             f"&var-scenario={self.var_scenario}"
             f"&var-ResourceGroups={self.resource_groups}"
             f"&var-Namespace={self.names_space}"
         )
         return base_url + params
+
+    def str_from_ts(self) -> str:
+        """
+        Returns the 'from' timestamp as a string.
+
+        Returns:
+            str: The 'from' timestamp formatted as a string.
+        """
+        if isinstance(self.from_ts, str):
+            return self.from_ts.replace(":", "-").replace(" ", "_") + "-"
+
+        return str(self.from_ts)
 
     def update_grafana_dashboard(self, from_to: FromTo = None, name_space: str = None, resource_groups: str = None,
                                  var_scenario: str = None):
@@ -82,7 +111,7 @@ class ChromeDriver:
             input("Press enter to continue...")
             self.driver.get(url)
 
-    def click_menu_and_get_new_csv(self, title: str):
+    def click_menu_and_inspect_data(self, title: str):
         driver = self.driver
 
         menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
