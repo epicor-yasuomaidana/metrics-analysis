@@ -26,7 +26,7 @@ def cast_date(ts: int | str) -> int:
     """
     if isinstance(ts, str) and "now" not in ts:
         dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
-        return int(dt.timestamp())
+        return int(dt.timestamp() * 1000)
     return ts
 
 
