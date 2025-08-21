@@ -2,7 +2,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 
 from selenium import webdriver
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
@@ -82,7 +82,7 @@ class ChromeDriver:
             input("Press enter to continue...")
             self.driver.get(url)
 
-    def click_menu_and_get_new_csv(self,title: str):
+    def click_menu_and_get_new_csv(self, title: str):
         driver = self.driver
 
         menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
@@ -95,7 +95,8 @@ class ChromeDriver:
         try:
             expand_button = wait.until(ec.element_to_be_clickable((By.XPATH, expand_xpath)))
             expand_button.click()
-        except TimeoutException:
+        except (TimeoutException, ElementClickInterceptedException):
             print("\t\033[91mExpand button not found, trying to locate it again.\033[0m")
         except Exception as e:
+            print(type(e))
             print(e)
