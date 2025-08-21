@@ -12,6 +12,20 @@ def get_csv_files_from_download(download_path=None):
 
     return set(csv_files)
 
+def skip_search(cached_file:str, forced:bool = False) -> bool:
+    """
+    Check if the file exists and if it should be skipped based on the forced flag.
+
+    :param cached_file: The path to the cached file.
+    :param forced: If True, the file will not be skipped even if it exists.
+    :return: True if the file should be skipped, False otherwise.
+    """
+    if not os.path.exists(cached_file):
+        return False
+    if forced:
+        os.remove(cached_file)
+        return False
+    return True
 
 def get_generated_file(set_of_files, download_path=None) -> str:
     current_files = get_csv_files_from_download(download_path)
