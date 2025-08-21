@@ -8,7 +8,7 @@ from config import GrafanaUrlInputs, ChromeOptions
 from file_manager import get_csv_files_from_download
 
 
-def click_menu_and_get_new_csv(driver, title):
+def click_menu_and_get_new_csv(driver, title:str):
     starting_csv = get_csv_files_from_download()
     menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
     wait = WebDriverWait(driver, 60)
@@ -25,7 +25,6 @@ def click_menu_and_get_new_csv(driver, title):
 
     input("Type Enter to continue...")
     downloaded_csv = get_csv_files_from_download() - starting_csv
-    print(downloaded_csv)
     return downloaded_csv
 
 def open_chrome_session(url, user_data_dir, profile_directory="Default"):
@@ -47,23 +46,7 @@ def open_chrome_session(url, user_data_dir, profile_directory="Default"):
 
 def navigate_and_download(driver):
 
-    starting_csv = get_csv_files_from_download()
-    menu_xpath = '//h2[@title="Reqs per Scenario"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"Reqs per Scenario")]'
-    # Selenium code to click the menu
-    wait = WebDriverWait(driver, 60)
-    menu_button = wait.until(ec.element_to_be_clickable((By.XPATH, menu_xpath)))
-    menu_button.click()
-
-    driver.switch_to.active_element.send_keys('i')
-    expand_xpath = '//button[@aria-label="Expand query row"]'
-    try:
-        expand_button = wait.until(ec.element_to_be_clickable((By.XPATH, expand_xpath)))
-        expand_button.click()
-    except Exception as e:
-        print("Error locating the expand button")
-
-    input("Type Enter to continue...")
-    downloaded_csv = get_csv_files_from_download() - starting_csv
+    downloaded_csv = click_menu_and_get_new_csv(driver,"APIs per Scenario")
     print(downloaded_csv)
 
 
