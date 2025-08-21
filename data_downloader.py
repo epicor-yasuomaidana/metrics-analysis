@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
-from config import GrafanaUrlInputs, ChromeOptions, build_grafana_url
+from config import GrafanaUrlInputs, ChromeOptions
 from file_manager import get_csv_files_from_download
 
 
@@ -41,7 +41,11 @@ def open_chrome_session(url, user_data_dir, profile_directory="Default"):
     if "login" in driver.current_url:
         print("Redirected to login page.")
         driver.get(url)
+    navigate_and_download(driver)
 
+
+
+def navigate_and_download(driver):
 
     starting_csv = get_csv_files_from_download()
     menu_xpath = '//h2[@title="Reqs per Scenario"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"Reqs per Scenario")]'
@@ -58,16 +62,9 @@ def open_chrome_session(url, user_data_dir, profile_directory="Default"):
     except Exception as e:
         print("Error locating the expand button")
 
-
     input("Type Enter to continue...")
     downloaded_csv = get_csv_files_from_download() - starting_csv
     print(downloaded_csv)
-
-
-    return driver
-
-def navigate_and_download(grafana_info: GrafanaUrlInputs, boards:list[str]):
-    url = build_grafana_url(grafana_info)
 
 
 
@@ -83,7 +80,7 @@ if __name__ == "__main__":
     user_data_dir_i = r"C:\Users\yasuo.maidana\AppData\Local\Google\Chrome\User Data\Default"
 
     grafana_inputs = GrafanaUrlInputs(from_ts, to_ts, var_scenario, resource_groups, names_space)
-    url = build_grafana_url(grafana_inputs)
+    url = grafana_inputs.build_url()
     print(ChromeOptions(
         user_data_dir=user_data_dir_i,
         profile_directory="Default"
