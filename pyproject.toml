@@ -4,5 +4,9 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
 dependencies = [
+    "matplotlib>=3.10.5",
+    "notebook>=7.4.5",
+    "pandas>=2.3.2",
+    "pandas-stubs==2.3.0.250703",
     "selenium>=4.35.0",
 ]
