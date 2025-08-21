@@ -9,7 +9,7 @@ default_titles = [
 
 class QuickDownloader:
     def __init__(self, grafana_urls: list[GrafanaUrlInputs], options: ChromeOptions,
-                 dashboards: list[str] = tuple(default_titles), download_path: str = None):
+                 dashboards: tuple[str, ...] = tuple(default_titles), download_path: str = None):
         self.grafana_urls = grafana_urls
         self.driver = ChromeDriver(grafana_urls[0], options=options)
         self.dashboards = dashboards
@@ -23,7 +23,11 @@ class QuickDownloader:
             starting_date = grafana_url.str_from_ts()
             for title in self.dashboards:
                 original_files = get_csv_files_from_download(self.download_path)
-                destination_path = f"./quick/{instance}_{starting_date}_{test_id}_{title}.csv"
+                if test_id:
+                    destination_path = f"./quick/{instance}_{starting_date}t_id{test_id}_{title}.csv"
+                else:
+                    destination_path = f"./quick/{instance}_{starting_date}{title}.csv"
+
                 if skip_search(destination_path, forced):
                     print(f"Skipping {title} as it already exists in {destination_path}")
                     continue
@@ -42,11 +46,17 @@ if __name__ == "__main__":
     resource_groups = "rgQAToolsSaaSAKSResources-EastUS"
     names_space = "perfwamd2"
 
-    grafana_inputs = GrafanaUrlInputs(from_ts, to_ts, var_scenario, resource_groups, names_space)
+    dashboards_ = ("Total Requests per Scenario", "TTFB per Scenario")
+    grafana_inputs = GrafanaUrlInputs(from_ts, to_ts, names_space, var_scenario, resource_groups)
+
     options_ = ChromeOptions(r"C:\Users\yasuo.maidana\AppData\Local\Google\Chrome\User Data\Default",
                              "Default")
 
-    downloader = QuickDownloader([grafana_inputs], options_)
+    downloader = QuickDownloader([grafana_inputs], options_, dashboards=dashboards_)
+    downloader.download()
+
+    downloader.dashboards = ["Panel Title"]
+    downloader.grafana_urls = [GrafanaUrlInputs(from_ts, to_ts, names_space, version="cevpr06yrc0e8a/group-duration")]
     downloader.download()
     input("Press Enter to finish...")
 
