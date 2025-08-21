@@ -1,7 +1,8 @@
-def get_csv_files_from_download(download_path=r"C:\Users\yasuo.maidana\Downloads"):
+def get_csv_files_from_download(download_path=None):
     import os
 
-    # Ensure the download path exists
+    if download_path is None:
+            download_path = os.path.join(os.path.expanduser("~"), "Downloads")
     if not os.path.exists(download_path):
         raise ValueError(f"The specified download path does not exist: {download_path}")
 
