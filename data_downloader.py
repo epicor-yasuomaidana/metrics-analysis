@@ -1,59 +1,12 @@
-from collections import namedtuple
-
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
 
-def get_csv_files_from_download(download_path=r"C:\Users\yasuo.maidana\Downloads"):
-    import os
+from config import GrafanaUrlInputs, ChromeOptions, build_grafana_url
+from file_manager import get_csv_files_from_download
 
-    # Ensure the download path exists
-    if not os.path.exists(download_path):
-        raise ValueError(f"The specified download path does not exist: {download_path}")
-
-    # Use glob to find all CSV files in the download directory
-    csv_files = [f for f in os.listdir(download_path) if f.lower().endswith('.csv')]
-
-    return set(csv_files)
-
-
-GrafanaUrlInputs = namedtuple("GrafanaUrlInputs", ["from_ts", "to_ts", "var_scenario", "resource_groups", "names_space"])
-ChromeOptions = namedtuple("ChromeOptions", ["user_data_dir","profile_directory"])
-
-def build_grafana_url(grafana_inputs: GrafanaUrlInputs):
-    """
-    Constructs a Grafana dashboard URL with specified parameters.
-
-    Args:
-        grafana_inputs (GrafanaUrlInputs): Named tuple containing all required URL parameters:
-                - from_ts (int): The 'from' timestamp.
-                - to_ts (int): The 'to' timestamp.
-                - var_scenario (str): The scenario filter value.
-                - resource_groups (str): The resource groups value.
-                - names_space (str): The namespace value.
-
-    Returns:
-        str: The complete URL with parameters.
-    """
-    base_url = (
-        "http://mslab-2024:3000/d/eevf3vhn0308wd/k6-execution-monitoring-with-scenario-filters"
-        "?orgId=1"
-        "&var-Workspace="
-        "&var-AKS=aksCluster-EastUS"
-        "&var-ds=beh175ytk7i80c"
-        "&var-sub=KineticQATools"
-        "&var-rg=rgProdSaaSSqlResources-EastUS"
-    )
-    params = (
-        f"&from={grafana_inputs.from_ts}"
-        f"&to={grafana_inputs.to_ts}"
-        f"&var-scenario={grafana_inputs.var_scenario}"
-        f"&var-ResourceGroups={grafana_inputs.resource_groups}",
-        f"&var-Namespace={grafana_inputs.names_space}"
-    )
-    return base_url + "".join(params)
 
 def click_menu_and_get_new_csv(driver, title):
     starting_csv = get_csv_files_from_download()
@@ -75,7 +28,7 @@ def click_menu_and_get_new_csv(driver, title):
     print(downloaded_csv)
     return downloaded_csv
 
-def open_existing_chrome_session(url, user_data_dir, profile_directory="Default"):
+def open_chrome_session(url, user_data_dir, profile_directory="Default"):
     chrome_options = Options()
     chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
     chrome_options.add_argument(f"--profile-directory={profile_directory}")
@@ -113,7 +66,7 @@ def open_existing_chrome_session(url, user_data_dir, profile_directory="Default"
 
     return driver
 
-def navigate_and_download(grafana_info:GrafanaUrlInputs, boards:list[str]):
+def navigate_and_download(grafana_info: GrafanaUrlInputs, boards:list[str]):
     url = build_grafana_url(grafana_info)
 
 
@@ -137,7 +90,7 @@ if __name__ == "__main__":
     ))
     print(url)
 
-    open_existing_chrome_session(url, user_data_dir_i)
+    open_chrome_session(url, user_data_dir_i)
 
 
 
