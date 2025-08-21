@@ -30,11 +30,22 @@ def init_tables():
                    (
                        url_id    INTEGER,
                        title_id  INTEGER,
-                       file_path TEXT,
+                       file_path TEXT UNIQUE,
                        PRIMARY KEY (url_id, title_id),
                        FOREIGN KEY (url_id) REFERENCES urls (id),
                        FOREIGN KEY (title_id) REFERENCES titles (id)
                    )
+                   """)
+
+    cursor.execute("""
+                   CREATE TABLE IF NOT EXISTS quick_files
+                   (
+                       id        INTEGER PRIMARY KEY AUTOINCREMENT,
+                       url_id    INTEGER,
+                       file_path TEXT UNIQUE,
+                       FOREIGN KEY (url_id) REFERENCES urls (id)
+                   )
+
                    """)
 
     conn.commit()
