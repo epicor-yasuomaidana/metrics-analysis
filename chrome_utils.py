@@ -102,9 +102,6 @@ class ChromeDriver:
             chrome_options = Options()
             chrome_options.add_argument(f"--user-data-dir={options.user_data_dir}")
             chrome_options.add_argument(f"--profile-directory={options.profile_directory}")
-            chrome_options.add_argument("--remote-debugging-port=9222")
-            chrome_options.add_argument("--no-sandbox")
-            chrome_options.add_argument("--disable-dev-shm-usage")
 
             self.driver = webdriver.Chrome(options=chrome_options)
         else:
@@ -126,6 +123,9 @@ class ChromeDriver:
         button.click()
 
         driver.switch_to.active_element.send_keys(key)
+
+    def press_key(self, key: str):
+        self.driver.switch_to.active_element.send_keys(key)
 
     def click_menu_and_press(self, title: str, key: str):
         driver = self.driver
