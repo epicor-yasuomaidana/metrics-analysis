@@ -73,6 +73,11 @@ class QuickDownloader:
                 table_data = self.driver.copy_table(title)
                 table_data.to_csv(destination_path, index=False, encoding="utf-8")
 
+    def download(self):
+        self.download_tables()
+        self.download_dashboards()
+        self.driver.close()
+
 
 if __name__ == "__main__":
     from_ts = "2025-08-21 13:30:00"  # Example timestamp
@@ -80,14 +85,11 @@ if __name__ == "__main__":
     var_scenario = "ARInvoiceTracker"
     resource_groups = "rgQAToolsSaaSAKSResources-EastUS"
     names_space = "perfwamd2"
-    grafana_inputs = GrafanaUrlInputs(from_ts, to_ts, names_space, var_scenario, resource_groups)
+    grafana_inputs = GrafanaUrlInputs(from_ts, to_ts, names_space, "testing", var_scenario, resource_groups)
 
     options_ = ChromeOptions(r"C:\Users\yasuo.maidana\AppData\Local\Google\Chrome\User Data\Default",
                              "Default")
 
     downloader = QuickDownloader([grafana_inputs], options_)
-    downloader.download_tables()
-    downloader.download_dashboards()
-    input("Press Enter to finish...")
-
+    downloader.download()
     print("Finished")
