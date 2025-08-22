@@ -1,7 +1,7 @@
 from collections import namedtuple
 from dataclasses import dataclass
 from datetime import datetime
-
+import pandas as pd
 from selenium import webdriver
 from selenium.common import TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.chrome.options import Options
@@ -118,15 +118,44 @@ class ChromeDriver:
             input("Press enter to continue...")
             self.driver.get(url)
 
-    def click_menu_and_inspect_data(self, title: str):
+    def click_menu_and_press(self, title: str, key: str):
         driver = self.driver
 
-        menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
+        menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]'
         wait = WebDriverWait(driver, 60)
         menu_button = wait.until(ec.element_to_be_clickable((By.XPATH, menu_xpath)))
         menu_button.click()
 
-        driver.switch_to.active_element.send_keys('i')
+        driver.switch_to.active_element.send_keys(key)
+
+    def copy_table(self, title: str):
+        self.click_menu_and_press(title, 'v')
+        driver = self.driver
+        # Locate the panel by its title
+        panel_xpath = f'//h2[@title="{title}"]/ancestor::section'
+        wait = WebDriverWait(driver, 60)
+        wait.until(ec.presence_of_element_located((By.XPATH, panel_xpath)))
+        panel = driver.find_element(By.XPATH, panel_xpath)
+
+        table_body_xpath = './/div[@role="row"]'
+        rows = panel.find_elements(By.XPATH, table_body_xpath)
+
+        rows_iter = iter(rows)
+        header_cells = next(rows_iter).find_elements(By.XPATH, './/div[@role="columnheader"]')
+        columns = [cell.text for cell in header_cells]
+
+        table_data = [
+            [cell.text for cell in row.find_elements(By.XPATH, './/div[@role="cell"]')]
+            for row in rows_iter
+        ]
+
+        return pd.DataFrame(table_data, columns=columns)
+
+    def click_menu_and_inspect_data(self, title: str):
+        driver = self.driver
+
+        wait = WebDriverWait(driver, 60)
+        self.click_menu_and_press(title, 'i')
         expand_xpath = '//button[@aria-label="Expand query row"]'
         try:
             expand_button = wait.until(ec.element_to_be_clickable((By.XPATH, expand_xpath)))
