@@ -118,18 +118,29 @@ class ChromeDriver:
             input("Press enter to continue...")
             self.driver.get(url)
 
+    def click_and_press(self, xpath:str, key:str):
+        driver = self.driver
+
+        wait = WebDriverWait(driver, 60)
+        button = wait.until(ec.element_to_be_clickable((By.XPATH, xpath)))
+        button.click()
+
+        driver.switch_to.active_element.send_keys(key)
+
     def click_menu_and_press(self, title: str, key: str):
         driver = self.driver
 
-        menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]'
+        menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
         wait = WebDriverWait(driver, 60)
         menu_button = wait.until(ec.element_to_be_clickable((By.XPATH, menu_xpath)))
         menu_button.click()
 
         driver.switch_to.active_element.send_keys(key)
 
+
+
     def copy_table(self, title: str):
-        self.click_menu_and_press(title, 'v')
+        self.click_and_press(rf'//h2[@title="{title}"]', 'v')
         driver = self.driver
         # Locate the panel by its title
         panel_xpath = f'//h2[@title="{title}"]/ancestor::section'
@@ -148,6 +159,8 @@ class ChromeDriver:
             [cell.text for cell in row.find_elements(By.XPATH, './/div[@role="cell"]')]
             for row in rows_iter
         ]
+
+        driver.switch_to.active_element.send_keys('\u001b')  # Press Escape key
 
         return pd.DataFrame(table_data, columns=columns)
 
