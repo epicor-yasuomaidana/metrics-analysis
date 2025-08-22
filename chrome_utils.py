@@ -115,7 +115,7 @@ class ChromeDriver:
             input("Press enter to continue...")
             self.driver.get(url)
 
-    def click_and_press(self, xpath:str, key:str):
+    def click_and_press(self, xpath: str, key: str):
         driver = self.driver
 
         wait = WebDriverWait(driver, 60)
@@ -136,8 +136,6 @@ class ChromeDriver:
         menu_button.click()
 
         driver.switch_to.active_element.send_keys(key)
-
-
 
     def copy_table(self, title: str):
         self.click_and_press(rf'//h2[@title="{title}"]', 'v')
@@ -178,3 +176,9 @@ class ChromeDriver:
         except Exception as e:
             print(type(e))
             print(e)
+
+    def close(self):
+        """
+        Closes the Chrome driver.
+        """
+        self.driver.quit()
