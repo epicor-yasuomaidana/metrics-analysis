@@ -95,7 +95,7 @@ class QuickDownloader:
         self.download_tables()
         self.download_dashboards()
         self.driver.close()
-        print(self.data)
+        return self.data
 
 
 if __name__ == "__main__":
