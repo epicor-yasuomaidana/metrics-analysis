@@ -102,13 +102,65 @@ class QuickDownloader:
             self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
             print(f"\033[38;5;208mFinishing tables for {grafana_url.names_space}\033[0m")
 
-    def download(self):
+    def all_tables_downloaded(self, test_id: str = None, forced: bool = False) -> bool:
+        all_downloaded = True
+        for grafana_url in self.grafana_urls:
+            instance = grafana_url.names_space
+            starting_date = grafana_url.str_from_ts()
+            tables = {}
+            for title in self.tables:
+                if test_id:
+                    destination_path = f"./quick/{instance}_{starting_date}t_id{test_id}_{title}_table.csv"
+                else:
+                    destination_path = f"./quick/{instance}_{starting_date}{title}_table.csv"
+                if skip_search(destination_path, forced):
+                    tables[title] = destination_path
+                else:
+                    all_downloaded = False
+            stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
+            stored_data.update({"tables": tables})
+            self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
+        return all_downloaded
+
+    def all_dashboards_downloaded(self, test_id: str = None, forced: bool = False) -> bool:
+        all_downloaded = True
+        for grafana_url in self.grafana_urls:
+            instance = grafana_url.names_space
+            starting_date = grafana_url.str_from_ts()
+            dashboards = {}
+            for title in self.dashboards:
+                if test_id:
+                    destination_path = f"./quick/{instance}_{starting_date}t_id{test_id}_{title}.csv"
+                else:
+                    destination_path = f"./quick/{instance}_{starting_date}{title}.csv"
+                if skip_search(destination_path, forced):
+                    dashboards[title] = destination_path
+                else:
+                    all_downloaded = False
+            # Check "Group Duration" dashboard
+            if test_id:
+                group_duration_path = f"./quick/{instance}_{starting_date}t_id{test_id}_Group Duration.csv"
+            else:
+                group_duration_path = f"./quick/{instance}_{starting_date}Group Duration.csv"
+            if skip_search(group_duration_path, forced):
+                dashboards["Group Duration"] = group_duration_path
+            else:
+                all_downloaded = False
+            stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
+            stored_data.update({"dashboards": dashboards})
+            stored_data.update({"vus": grafana_url.vus})
+            self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
+        return all_downloaded
+
+    def download(self)->dict:
         try:
-            self.download_tables()
-            self.download_dashboards()
+            if not self.all_tables_downloaded():
+                self.download_tables()
+            if not self.all_dashboards_downloaded():
+                self.download_dashboards()
+            return self.data
         finally:
             self.driver.close()
-        return self.data
 
 
 if __name__ == "__main__":
