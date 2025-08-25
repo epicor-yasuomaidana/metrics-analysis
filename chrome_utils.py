@@ -43,6 +43,7 @@ class GrafanaUrlInputs:
     to_ts: int | str
     names_space: str
     identifier: str
+    vus: int
     var_scenario: str = None
     resource_groups: str = None
     base_url: str = "http://mslab-2024:3000/d/"
