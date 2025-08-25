@@ -51,6 +51,8 @@ class QuickDownloader:
 
         for grafana_url in self.grafana_urls:
             self.driver.go_to_dashboard(grafana_url.build_url())
+            input(
+                f"Downloading dashboards CSV for namespace: \033[92m{grafana_url.names_space}\033[0m, identifier: \033[92m{grafana_url.identifier}\033[0m, press enter to continue...")
             instance = grafana_url.names_space
             starting_date = grafana_url.str_from_ts()
 
@@ -66,6 +68,7 @@ class QuickDownloader:
             stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
             stored_data.update({"dashboards": dashboards})
             self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
+            print(f"\033[38;5;208mFinishing dashboards for {grafana_url.names_space}\033[0m")
 
     def download_tables(self, test_id: str = None, forced: bool = False):
         print("\033[93mDownloading tables...\033[0m")
@@ -74,7 +77,7 @@ class QuickDownloader:
             self.driver.go_to_dashboard(grafana_url.build_url())
             instance = grafana_url.names_space
             starting_date = grafana_url.str_from_ts()
-            input(f"Enter to continue ...")
+            input(f"Downloading tables for namespace: \033[92m{grafana_url.names_space}\033[0m, identifier: \033[92m{grafana_url.identifier}\033[0m, press enter to continue...")
             for title in self.tables:
                 if test_id:
                     destination_path = f"./quick/{instance}_{starting_date}t_id{test_id}_{title}_table.csv"
@@ -95,6 +98,7 @@ class QuickDownloader:
             stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
             stored_data.update({"tables": tables})
             self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
+            print(f"\033[38;5;208mFinishing tables for {grafana_url.names_space}\033[0m")
 
     def download(self):
         try:
