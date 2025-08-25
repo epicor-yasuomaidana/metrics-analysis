@@ -12,13 +12,12 @@ default_titles = [
 tables_titles = ["Iterations per Scenario", "Request Duration per Scenario p99", "Avg Iteration Duration p99",
                  "TTFB per Scenario", "Total Requests per Scenario"]
 
-
 chrome_profile_path = os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data",
-                                       "Default")
+                                   "Default")
 default_options = ChromeOptions(chrome_profile_path, "Default")
 
 class QuickDownloader:
-    def __init__(self, grafana_urls: list[GrafanaUrlInputs], options: ChromeOptions=default_options,
+    def __init__(self, grafana_urls: list[GrafanaUrlInputs], options: ChromeOptions = default_options,
                  dashboards: tuple[str, ...] = tuple(default_titles), tables=tuple(tables_titles),
                  download_path: str = None, group_duration_version: str = "cevpr06yrc0e8a/group-duration"):
         self.grafana_urls = grafana_urls
@@ -29,7 +28,7 @@ class QuickDownloader:
         self.group_duration_version = group_duration_version
         self.data = defaultdict(dict)
 
-    def _process_dashboard_title(self, title, instance, starting_date, test_id, forced):
+    def _process_dashboard_title(self, title, instance, starting_date, test_id, forced, section=None):
         original_files = get_csv_files_from_download(self.download_path)
         if test_id:
             destination_path = f"./quick/{instance}_{starting_date}t_id{test_id}_{title}.csv"
@@ -40,14 +39,14 @@ class QuickDownloader:
             print(f"Skipping {title} as it already exists in {destination_path}")
             return destination_path
         print(f"\033[94mHover {{{title}}}\033[0m")
-        self.driver.click_menu_and_inspect_data(title)
+        self.driver.click_menu_and_inspect_data(title, section)
         input(f"Enter to continue after saving {title}...")
         self.driver.press_key('\u001b')
         generated_file = get_generated_file(original_files, self.download_path)
         move_generated_file(generated_file, destination_path)
         return destination_path
 
-    def download_dashboards(self, test_id: str = None, forced: bool = False):
+    def download_dashboards(self, test_id: str = None, forced: bool = False, section: str = "General Summary"):
         print("\033[93mDownloading dashboards...\033[0m")
 
         for grafana_url in self.grafana_urls:
@@ -57,7 +56,8 @@ class QuickDownloader:
 
             dashboards = {}
             for title in self.dashboards:
-                dashboards[title] = self._process_dashboard_title(title, instance, starting_date, test_id, forced)
+                dashboards[title] = self._process_dashboard_title(title, instance, starting_date, test_id, forced,
+                                                                  section)
             grafana_url.version = self.group_duration_version
             self.driver.go_to_dashboard(grafana_url.build_url())
             dashboards["Group Duration"] = self._process_dashboard_title("Group Duration", instance, starting_date,
