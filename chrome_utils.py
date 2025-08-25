@@ -42,7 +42,7 @@ class GrafanaUrlInputs:
     from_ts: int | str
     to_ts: int | str
     names_space: str
-    identifier:str
+    identifier: str
     var_scenario: str = None
     resource_groups: str = None
     base_url: str = "http://mslab-2024:3000/d/"
@@ -128,10 +128,14 @@ class ChromeDriver:
     def press_key(self, key: str):
         self.driver.switch_to.active_element.send_keys(key)
 
-    def click_menu_and_press(self, title: str, key: str):
+    def click_menu_and_press(self, title: str, key: str, section: str = None):
         driver = self.driver
 
-        menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
+        if section:
+            menu_xpath = f'//div[div/button[normalize-space(text())="{section}"]]/following-sibling::div[div/section[.//h2[normalize-space(text())="{title}"]]]'
+        else:
+            menu_xpath = f'//h2[@title="{title}"]/ancestor::div[contains(@class,"panel-header")]//button[@title="Menu" and contains(@aria-label,"{title}")]'
+
         wait = WebDriverWait(driver, 60)
         menu_button = wait.until(ec.element_to_be_clickable((By.XPATH, menu_xpath)))
         menu_button.click()
@@ -163,11 +167,11 @@ class ChromeDriver:
 
         return pd.DataFrame(table_data, columns=columns)
 
-    def click_menu_and_inspect_data(self, title: str):
+    def click_menu_and_inspect_data(self, title: str, section: str = None):
         driver = self.driver
 
         wait = WebDriverWait(driver, 60)
-        self.click_menu_and_press(title, 'i')
+        self.click_menu_and_press(title, 'i', section)
         expand_xpath = '//button[@aria-label="Expand query row"]'
         try:
             expand_button = wait.until(ec.element_to_be_clickable((By.XPATH, expand_xpath)))
