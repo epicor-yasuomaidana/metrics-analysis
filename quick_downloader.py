@@ -1,3 +1,4 @@
+import os
 from collections import defaultdict
 
 from cache_manager.file_manager import get_csv_files_from_download, get_generated_file, move_generated_file, skip_search
@@ -12,8 +13,12 @@ tables_titles = ["Iterations per Scenario", "Request Duration per Scenario p99",
                  "TTFB per Scenario", "Total Requests per Scenario"]
 
 
+chrome_profile_path = os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data",
+                                       "Default")
+default_options = ChromeOptions(chrome_profile_path, "Default")
+
 class QuickDownloader:
-    def __init__(self, grafana_urls: list[GrafanaUrlInputs], options: ChromeOptions,
+    def __init__(self, grafana_urls: list[GrafanaUrlInputs], options: ChromeOptions=default_options,
                  dashboards: tuple[str, ...] = tuple(default_titles), tables=tuple(tables_titles),
                  download_path: str = None, group_duration_version: str = "cevpr06yrc0e8a/group-duration"):
         self.grafana_urls = grafana_urls
@@ -92,15 +97,17 @@ class QuickDownloader:
             self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
 
     def download(self):
-        self.download_tables()
-        self.download_dashboards()
-        self.driver.close()
+        try:
+            self.download_tables()
+            self.download_dashboards()
+        finally:
+            self.driver.close()
         return self.data
 
 
 if __name__ == "__main__":
-    from_ts = "2025-08-21 13:30:00"  # Example timestamp
-    to_ts = "2025-08-21 15:00:00"  # Example timestamp
+    from_ts = "2025-08-22 12:50:00"  # Example timestamp
+    to_ts = "2025-08-22 14:20:00"  # Example timestamp
     var_scenario = "ARInvoiceTracker"
     resource_groups = "rgQAToolsSaaSAKSResources-EastUS"
     names_space = "perfwamd2"
