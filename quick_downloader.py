@@ -16,6 +16,7 @@ chrome_profile_path = os.path.join(os.environ["USERPROFILE"], "AppData", "Local"
                                    "Default")
 default_options = ChromeOptions(chrome_profile_path, "Default")
 
+
 class QuickDownloader:
     def __init__(self, grafana_urls: list[GrafanaUrlInputs], options: ChromeOptions = default_options,
                  dashboards: tuple[str, ...] = tuple(default_titles), tables=tuple(tables_titles),
@@ -67,6 +68,7 @@ class QuickDownloader:
 
             stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
             stored_data.update({"dashboards": dashboards})
+            stored_data.update({"vus": grafana_url.vus})
             self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
             print(f"\033[38;5;208mFinishing dashboards for {grafana_url.names_space}\033[0m")
 
@@ -115,7 +117,7 @@ if __name__ == "__main__":
     var_scenario = "ARInvoiceTracker"
     resource_groups = "rgQAToolsSaaSAKSResources-EastUS"
     names_space = "perfwamd2"
-    grafana_inputs = GrafanaUrlInputs(from_ts, to_ts, names_space, "testing", var_scenario, resource_groups)
+    grafana_inputs = GrafanaUrlInputs(from_ts, to_ts, names_space, "testing", 240, var_scenario, resource_groups)
 
     options_ = ChromeOptions(r"C:\Users\yasuo.maidana\AppData\Local\Google\Chrome\User Data\Default",
                              "Default")
