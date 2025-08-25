@@ -99,6 +99,7 @@ class QuickDownloader:
                 tables[title] = destination_path
             stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
             stored_data.update({"tables": tables})
+            stored_data.update({"instance_identifier": (grafana_url.names_space, grafana_url.identifier)})
             self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
             print(f"\033[38;5;208mFinishing tables for {grafana_url.names_space}\033[0m")
 
@@ -149,6 +150,7 @@ class QuickDownloader:
             stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
             stored_data.update({"dashboards": dashboards})
             stored_data.update({"vus": grafana_url.vus})
+            stored_data.update({"instance_identifier": (grafana_url.names_space, grafana_url.identifier)})
             self.data[f"{grafana_url.names_space}_{grafana_url.identifier}"] = stored_data
         return all_downloaded
 
