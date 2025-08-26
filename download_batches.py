@@ -11,8 +11,8 @@ if __name__ == "__main__":
     names_space = "perflamd1"
     l1 = GrafanaUrlInputs(from_ts, to_ts, names_space, "l1", vus, var_scenario, resource_groups)
 
-    from_ts = "2025-08-21 18:00:00"  # Example timestamp
-    to_ts = "2025-08-21 19:30:00"  # Example timestamp
+    from_ts = "2025-08-22 15:10:00"  # Example timestamp
+    to_ts = "2025-08-22 16:40:00"  # Example timestamp
     var_scenario = "ARInvoiceTracker"
     resource_groups = "rgQAToolsSaaSAKSResources-EastUS"
     names_space = "perfwamd2"
