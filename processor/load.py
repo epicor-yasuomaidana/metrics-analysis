@@ -29,14 +29,26 @@ def load_normalized_csv(file_path: str) -> DataFrame:
     return df
 
 
-def load_sum_total(file_path, columns_to_sum=None, caster=cast_string_duration_to_seconds) -> DataFrame:
+def load_with_caster(file_path, columns_to_cast=None, caster=cast_string_duration_to_seconds) -> DataFrame:
     df = load_normalized_csv(file_path)
-    if columns_to_sum is None:
-        columns_to_sum = [col for col in df.columns if col != "dT"]
-    if not all(pd.api.types.is_numeric_dtype(df[col]) for col in columns_to_sum):
-        for col in columns_to_sum:
+    if columns_to_cast is None:
+        columns_to_cast = [col for col in df.columns if col != "dT"]
+    if not all(pd.api.types.is_numeric_dtype(df[col]) for col in columns_to_cast):
+        for col in columns_to_cast:
             df[col] = caster(df[col])
+    return df
+
+
+
+
+def load_sum_total(file_path, columns_to_sum=None, caster=cast_string_duration_to_seconds) -> DataFrame:
+    df = load_with_caster(file_path, columns_to_cast=columns_to_sum, caster=caster)
     df["total"] = df.sum(axis=1)
+    return df
+
+def load_mean_df(file_path, columns_to_average=None, caster=cast_string_duration_to_seconds) -> DataFrame:
+    df = load_with_caster(file_path, columns_to_cast=columns_to_average, caster=caster)
+    df["mean"] = df.mean(axis=1)
     return df
 
 
