@@ -41,14 +41,14 @@ def load_with_caster(file_path, columns_to_cast=None, caster=cast_string_duratio
 
 
 
-def load_sum_total(file_path, columns_to_sum=None, caster=cast_string_duration_to_seconds) -> DataFrame:
+def load_sum_total(file_path, columns_to_sum, caster=cast_string_duration_to_seconds) -> DataFrame:
     df = load_with_caster(file_path, columns_to_cast=columns_to_sum, caster=caster)
-    df["total"] = df.sum(axis=1)
+    df["total"] = df[columns_to_sum].sum(axis=1)
     return df
 
-def load_mean_df(file_path, columns_to_average=None, caster=cast_string_duration_to_seconds) -> DataFrame:
+def load_mean_df(file_path, columns_to_average, caster=cast_string_duration_to_seconds) -> DataFrame:
     df = load_with_caster(file_path, columns_to_cast=columns_to_average, caster=caster)
-    df["mean"] = df.mean(axis=1)
+    df["mean"] = df[columns_to_average].mean(axis=1)
     return df
 
 
