@@ -63,8 +63,9 @@ class QuickDownloader:
                                                                   section)
             grafana_url.version = self.group_duration_version
             self.driver.go_to_dashboard(grafana_url.build_url())
-            dashboards["Group Duration"] = self._process_dashboard_title("Group Duration", instance, starting_date,
-                                                                         test_id, forced)
+            for dashboard in ["Group Duration", "Group Requests", "Group TTFB"]:
+                dashboards[dashboard] = self._process_dashboard_title(dashboard, instance, starting_date,
+                                                                      test_id, forced, section="Row title")
 
             stored_data = self.data.get(f"{grafana_url.names_space}_{grafana_url.identifier}", {})
             stored_data.update({"dashboards": dashboards})
@@ -79,7 +80,8 @@ class QuickDownloader:
             self.driver.go_to_dashboard(grafana_url.build_url())
             instance = grafana_url.names_space
             starting_date = grafana_url.str_from_ts()
-            input(f"Downloading tables for namespace: \033[92m{grafana_url.names_space}\033[0m, identifier: \033[92m{grafana_url.identifier}\033[0m, press enter to continue...")
+            input(
+                f"Downloading tables for namespace: \033[92m{grafana_url.names_space}\033[0m, identifier: \033[92m{grafana_url.identifier}\033[0m, press enter to continue...")
             for title in self.tables:
                 if test_id:
                     destination_path = f"./quick/{instance}_{starting_date}t_id{test_id}_{title}_table.csv"
@@ -136,6 +138,15 @@ class QuickDownloader:
                     destination_path = f"./quick/{instance}_{starting_date}{title}.csv"
                 if skip_search(destination_path, forced):
                     dashboards[title] = destination_path
+                else:
+                    all_downloaded = False
+            for dashboard in ["Group Duration", "Group Requests", "Group TTFB"]:
+                if test_id:
+                    dashboard_path = f"./quick/{instance}_{starting_date}t_id{test_id}_{dashboard}.csv"
+                else:
+                    dashboard_path = f"./quick/{instance}_{starting_date}{dashboard}.csv"
+                if skip_search(dashboard_path, forced):
+                    dashboards[dashboard] = dashboard_path
                 else:
                     all_downloaded = False
             # Check "Group Duration" dashboard
