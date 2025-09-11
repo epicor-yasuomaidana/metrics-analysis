@@ -8,7 +8,7 @@ from pandas import DataFrame
 from plotters.common import get_palette
 
 
-def plot_throughput_hist(
+def plot_hist(
         x_col: str,
         df: DataFrame,
         unit: str,
