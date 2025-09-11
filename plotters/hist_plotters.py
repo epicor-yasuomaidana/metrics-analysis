@@ -5,6 +5,8 @@ import seaborn as sns
 from matplotlib.axes import Axes
 from pandas import DataFrame
 
+from plotters.common import get_palette
+
 
 def plot_throughput_hist(
         x_col: str,
@@ -13,24 +15,22 @@ def plot_throughput_hist(
         ylabel: str,
         title: str,
         ax: Axes = None,
-        palette: dict = None
+        palette: dict = None,
+        grouper: str = "instance",
+        loc="upper left",
 ):
-    if palette is None:
-        instances = df["instance"].unique()
-        palette = dict(zip(instances, sns.color_palette("tab10", len(instances))))
-    else:
-        instances = palette.keys()
+    palette, instances = get_palette(df, grouper, palette)
 
     plt.rcParams["text.usetex"] = True
 
     if ax is None:
         fig, ax = plt.subplots(figsize=(9, 2.5))
 
-    sns.histplot(df.reset_index(), x=x_col, hue="instance", kde=True, palette=palette, ax=ax, multiple="layer")
+    sns.histplot(df.reset_index(), x=x_col, hue=grouper, kde=True, palette=palette, ax=ax, multiple="layer")
 
     line_handles = []
     data = {}
-    for name, group in df.groupby("instance"):
+    for name, group in df.groupby(grouper):
         mean = group[x_col].mean()
         ax.axvline(mean, color=palette[name], linestyle="-")
         line_handles.append(mlines.Line2D([], [], color=palette[name], linestyle="-", label=rf"$\bar{{x}}$"))
@@ -54,7 +54,7 @@ def plot_throughput_hist(
     ]
 
     hist_handles.extend(line_handles)
-    legend1 = ax.legend(handles=hist_handles, title="", loc="upper left")
+    legend1 = ax.legend(handles=hist_handles, title="", loc=loc)
     ax.add_artist(legend1)
 
     ax.set_title(title)
