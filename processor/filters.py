@@ -28,3 +28,10 @@ def cut_by_window(df, start_time_str, duration):
     start_time = parse_time_str(start_time_str)
     end_time = start_time + parse_time_str(duration)
     return cut_by_range(df, start_time, end_time)
+
+def filter_wrong_totals(df: pd.DataFrame, total_column="total", grouper_column="instance") -> pd.DataFrame:
+    result = []
+    for _, column_group in df.groupby(grouper_column):
+        filtered = column_group[column_group[total_column].diff() >= 0]
+        result.append(filtered)
+    return pd.concat(result)
