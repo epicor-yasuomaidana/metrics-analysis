@@ -25,7 +25,6 @@ def save_plot_if_new(filename: str, dpi: int = 300, style: str = matplotx.styles
     if not os.path.exists(filename):
         if style:
             with plt.style.context(style):
-
                 plt.savefig(filename, dpi=dpi, transparent=True)
         else:
             plt.savefig(filename, dpi=dpi, transparent=True)
