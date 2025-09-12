@@ -5,6 +5,7 @@ import pandas as pd
 from selenium import webdriver
 from selenium.common import TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
@@ -44,12 +45,12 @@ class GrafanaUrlInputs:
     names_space: str
     identifier: str
     vus: int
-    var_scenario: str = None
-    resource_groups: str = None
-    base_url: str = "http://mslab-2024:3000/d/"
-    version: str = "eevf3vhn0308wd/k6-execution-monitoring-with-scenario-filters"
-    org_id: int = 1
-    aksCluster: str = "aksCluster-EastUS"
+    var_scenario: str | None
+    resource_groups: str | None
+    base_url: str
+    version: str
+    org_id: int
+    aksCluster: str
 
     def build_url(self):
         """
@@ -99,16 +100,23 @@ class GrafanaUrlInputs:
 
 
 class ChromeDriver:
-    def __init__(self, grafana_dashboard: GrafanaUrlInputs, options: ChromeOptions = None):
+    def __init__(self, options: ChromeOptions = None):
+
         if options:
             chrome_options = Options()
             chrome_options.add_argument(f"--user-data-dir={options.user_data_dir}")
             chrome_options.add_argument(f"--profile-directory={options.profile_directory}")
-
-            self.driver = webdriver.Chrome(options=chrome_options)
         else:
-            self.driver = webdriver.Chrome()
-        self.go_to_dashboard(grafana_dashboard.build_url())
+            chrome_options = Options()
+        self._chrome_options = chrome_options
+        self._driver: WebDriver | None = None
+
+    @property
+    def driver(self) -> WebDriver:
+        if self._driver is None:
+            self._driver = webdriver.Chrome(options=self._chrome_options)
+
+        return self._driver
 
     def go_to_dashboard(self, url: str):
         self.driver.get(url)
